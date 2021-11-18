@@ -6,7 +6,6 @@ const db = require('./db-config');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-const path = require('path');
 require('dotenv').config();
 
 const webapp = express();
@@ -23,10 +22,8 @@ passport.serializeUser(serialize);
 passport.deserializeUser(deserialize);
 webapp.use(passport.initialize());
 
-webapp.use(express.static(path.join(__dirname, './client/build')));
-
 // TODO: change root URI
-webapp.post('/api/register', (req, res) => {
+webapp.post('/register', (req, res) => {
   bcrypt
     .hash(req.body.password, saltRounds)
     .then((hashedPW) => {
@@ -48,7 +45,7 @@ webapp.post('/api/register', (req, res) => {
     .catch((err) => res.status(500).send(err));
 });
 
-webapp.post('/api/login', (req, res) => {
+webapp.post('/login', (req, res) => {
   const { email, password } = req.body;
   if (email && password) {
     db.promise()
@@ -82,8 +79,9 @@ webapp.post('/api/login', (req, res) => {
 });
 
 // Root endpoint
-webapp.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, './client/build/index.html'));
+// TODO: alter for deployment
+webapp.get('/', (req, res) => {
+  res.json({ message: 'Welcome to the backend!' });
 });
 
 // Start server
